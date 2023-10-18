@@ -25,19 +25,19 @@ class _LoginPageState extends State<LoginPage> {
     emailController = TextEditingController();
     passwordController = TextEditingController();
 
-    // isLogin();
+    isLogin();
     // Future.delayed(const Duration(seconds: 2));
     super.initState();
   }
 
-  // void isLogin() async {
-  //   final isTokenExist = await AuthLocalDatasource().isLogin();
-  //   if (isTokenExist) {
-  //     Navigator.push(context, MaterialPageRoute(builder: (context) {
-  //       return const HomePage();
-  //     }));
-  //   }
-  // }
+  void isLogin() async {
+    final isTokenExist = await AuthLocalDatasource().isLogin();
+    if (isTokenExist) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return const HomePage();
+      }));
+    }
+  }
 
   @override
   void dispose() {

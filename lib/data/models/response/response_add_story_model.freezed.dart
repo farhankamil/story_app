@@ -21,9 +21,7 @@ ResponseAddStoryModel _$ResponseAddStoryModelFromJson(
 
 /// @nodoc
 mixin _$ResponseAddStoryModel {
-  @JsonKey(name: "error")
   bool get error => throw _privateConstructorUsedError;
-  @JsonKey(name: "message")
   String get message => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -38,9 +36,7 @@ abstract class $ResponseAddStoryModelCopyWith<$Res> {
           $Res Function(ResponseAddStoryModel) then) =
       _$ResponseAddStoryModelCopyWithImpl<$Res, ResponseAddStoryModel>;
   @useResult
-  $Res call(
-      {@JsonKey(name: "error") bool error,
-      @JsonKey(name: "message") String message});
+  $Res call({bool error, String message});
 }
 
 /// @nodoc
@@ -81,9 +77,7 @@ abstract class _$$_ResponseAddStoryModelCopyWith<$Res>
       __$$_ResponseAddStoryModelCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {@JsonKey(name: "error") bool error,
-      @JsonKey(name: "message") String message});
+  $Res call({bool error, String message});
 }
 
 /// @nodoc
@@ -116,18 +110,14 @@ class __$$_ResponseAddStoryModelCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$_ResponseAddStoryModel implements _ResponseAddStoryModel {
-  const _$_ResponseAddStoryModel(
-      {@JsonKey(name: "error") required this.error,
-      @JsonKey(name: "message") required this.message});
+  const _$_ResponseAddStoryModel({required this.error, required this.message});
 
   factory _$_ResponseAddStoryModel.fromJson(Map<String, dynamic> json) =>
       _$$_ResponseAddStoryModelFromJson(json);
 
   @override
-  @JsonKey(name: "error")
   final bool error;
   @override
-  @JsonKey(name: "message")
   final String message;
 
   @override
@@ -165,18 +155,15 @@ class _$_ResponseAddStoryModel implements _ResponseAddStoryModel {
 
 abstract class _ResponseAddStoryModel implements ResponseAddStoryModel {
   const factory _ResponseAddStoryModel(
-          {@JsonKey(name: "error") required final bool error,
-          @JsonKey(name: "message") required final String message}) =
-      _$_ResponseAddStoryModel;
+      {required final bool error,
+      required final String message}) = _$_ResponseAddStoryModel;
 
   factory _ResponseAddStoryModel.fromJson(Map<String, dynamic> json) =
       _$_ResponseAddStoryModel.fromJson;
 
   @override
-  @JsonKey(name: "error")
   bool get error;
   @override
-  @JsonKey(name: "message")
   String get message;
   @override
   @JsonKey(ignore: true)

@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:storyapp_intermediate/data/models/request/request_add_model.dart';
 
 import 'package:storyapp_intermediate/data/models/response/response_get_all_stories_model.dart';
 import 'package:storyapp_intermediate/data/remote_datasources/story_datasources.dart';

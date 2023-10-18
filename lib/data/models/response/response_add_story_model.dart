@@ -8,9 +8,7 @@ part 'response_add_story_model.g.dart';
 @freezed
 class ResponseAddStoryModel with _$ResponseAddStoryModel {
     const factory ResponseAddStoryModel({
-        @JsonKey(name: "error")
         required bool error,
-        @JsonKey(name: "message")
         required String message,
     }) = _ResponseAddStoryModel;
 
