@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storyapp_intermediate/bloc/add_new_story/add_new_story_bloc.dart';
-import 'package:storyapp_intermediate/bloc/cubit/add_story_cubit.dart';
 import 'package:storyapp_intermediate/bloc/detail/detail_bloc.dart';
 import 'package:storyapp_intermediate/bloc/get_all_story/get_all_story_bloc.dart';
 import 'package:storyapp_intermediate/bloc/login/login_bloc.dart';
@@ -41,9 +40,6 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => AddNewStoryBloc(StoryDatasource()),
         ),
-        // BlocProvider(
-        //   create: (context) => AddStoryCubit(StoryDatasource()),
-        // ),
       ],
       child: MaterialApp.router(
         routerConfig: GoRouter(

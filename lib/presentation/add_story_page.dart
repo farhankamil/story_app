@@ -9,18 +9,13 @@ import 'package:storyapp_intermediate/bloc/add_new_story/add_new_story_bloc.dart
 import 'package:storyapp_intermediate/bloc/get_all_story/get_all_story_bloc.dart';
 import 'package:storyapp_intermediate/common/assets_path.dart';
 import 'package:storyapp_intermediate/data/models/request/request_add_model.dart';
-import 'package:storyapp_intermediate/presentation/widgets/custom_snack_bar.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class AddStoryPage extends StatefulWidget {
   static const routeName = '/addStoryPage';
   const AddStoryPage({
-    // this.addStoryCubit,
-    // this.onAddStorySuccess,
     super.key,
   });
-
-  // final AddStoryCubit? addStoryCubit;
-  // final void Function()? onAddStorySuccess;
 
   @override
   State<AddStoryPage> createState() => _AddStoryPageState();
@@ -30,6 +25,17 @@ class _AddStoryPageState extends State<AddStoryPage> {
   final descriptionTextController = TextEditingController();
   final imageFile = ValueNotifier<XFile?>(null);
   final imagePath = ValueNotifier<String?>(null);
+
+  Future<void> _onGalleryView() async {
+    final picker = ImagePicker();
+
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
+    if (pickedFile != null) {
+      await _cropImage(pickedFile.path);
+    }
+  }
 
   Future<void> _onCameraView() async {
     final isAndroid = defaultTargetPlatform == TargetPlatform.android;
@@ -43,18 +49,43 @@ class _AddStoryPageState extends State<AddStoryPage> {
       source: ImageSource.camera,
     );
     if (pickedFile != null) {
-      setImageFile(pickedFile);
+      await _cropImage(pickedFile.path);
     }
   }
 
-  Future<void> _onGalleryView() async {
-    final picker = ImagePicker();
-
-    final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
+  Future<void> _cropImage(String imagePath) async {
+    final croppedFile = await ImageCropper().cropImage(
+      sourcePath: imagePath,
+      compressFormat: ImageCompressFormat.jpg,
+      compressQuality: 100,
+      uiSettings: [
+        AndroidUiSettings(
+            toolbarTitle: 'Cropper',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+        IOSUiSettings(
+          title: 'Cropper',
+        ),
+        WebUiSettings(
+          context: context,
+          presentStyle: CropperPresentStyle.dialog,
+          boundary: const CroppieBoundary(
+            width: 520,
+            height: 520,
+          ),
+          viewPort:
+              const CroppieViewPort(width: 480, height: 480, type: 'circle'),
+          enableExif: true,
+          enableZoom: true,
+          showZoomer: true,
+        ),
+      ],
     );
-    if (pickedFile != null) {
-      setImageFile(pickedFile);
+
+    if (croppedFile != null) {
+      setImageFile(XFile(croppedFile.path));
     }
   }
 
@@ -74,45 +105,6 @@ class _AddStoryPageState extends State<AddStoryPage> {
             fit: BoxFit.contain,
           );
   }
-
-  // Future<void> onUploadStory() async {
-  //   if (imagePath.value == null ||
-  //       imageFile.value == null ||
-  //       descriptionTextController.text.isEmpty) {
-  //     return showSnackBar(
-  //       context,
-  //       CustomSnackBar(
-  //         context: context,
-  //         content: const Text(
-  //           'emptyFormMessage',
-  //         ),
-  //       ),
-  //     );
-  //   }
-
-  //   final imageBytes = await imageFile.value?.readAsBytes();
-  //   // await widget.addStoryCubit!.addStory(
-  //   //   RequestAddModel(
-  //   //     description: 'descriptionTextController.text',
-  //   //     imageByte: imageBytes!,
-  //   //     // imageByte: 'imageBytes!',
-  //   //     fileName: imageFile.value!.name,
-  //   //     // fileName: 'imageFile.value!.name',
-  //   //     lat: 10.0,
-  //   //     lon: 10.0,
-  //   //   ),
-  //   // );
-
-  //   context.read<AddNewStoryBloc>().add(_Loaded(
-  //         RequestAddModel(
-  //           description: descriptionTextController.text,
-  //           imageByte: imageBytes!,
-  //           fileName: imageFile.value!.name,
-  //           lat: 10.0,
-  //           lon: 10.0,
-  //         ),
-  //       ));
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +134,6 @@ class _AddStoryPageState extends State<AddStoryPage> {
             ),
             children: [
               Text(
-                // '${AppLocalizations.of(context)!.shareYourStoryDesc} 🤩',
                 'berhasil',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
@@ -201,12 +192,6 @@ class _AddStoryPageState extends State<AddStoryPage> {
           maxLines: 8,
         ),
         const SizedBox(height: 20),
-        // ElevatedButton(
-        //   onPressed: onUploadStory,
-        //   child: const Text(
-        //     '.send.toUpperCase()',
-        //   ),
-        // ),
         BlocBuilder<GetAllStoryBloc, GetAllStoryState>(
           builder: (context, state) {
             return state.maybeWhen(
@@ -239,27 +224,6 @@ class _AddStoryPageState extends State<AddStoryPage> {
             );
           },
         ),
-
-        // ElevatedButton(
-        //   onPressed: state is AddStoryLoading ? null : onUploadStory,
-        //   child: Padding(
-        //     padding: const EdgeInsets.all(20),
-        //     child: state is AddStoryLoading
-        //         ? CircularProgressIndicator(
-        //             color: Theme.of(context).colorScheme.primary,
-        //           )
-        //         : const Row(
-        //             mainAxisAlignment: MainAxisAlignment.center,
-        //             children: [
-        //               Text(
-        //                 '.send.toUpperCase()',
-        //               ),
-        //               SizedBox(width: 20),
-        //               Icon(Icons.send),
-        //             ],
-        //           ),
-        //   ),
-        // ),
       ],
     );
   }
