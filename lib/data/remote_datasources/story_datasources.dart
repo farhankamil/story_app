@@ -6,27 +6,26 @@ import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 
 import 'package:dartz/dartz.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:storyapp_intermediate/data/models/request/request_add_model.dart';
-import 'package:storyapp_intermediate/data/models/response/response_get_all_stories_model.dart';
-import 'package:storyapp_intermediate/data/local_datasources/auth_localstorage.dart';
-import 'package:storyapp_intermediate/data/models/response/response_story_detail_model.dart';
+import 'package:storyapp_intermediate/data/models/new_request/add_newstory_request_model.dart';
+import 'package:storyapp_intermediate/data/models/new_response/add_newstory_response_model.dart';
+import 'package:storyapp_intermediate/data/models/new_response/detail_response_model.dart';
 
 import '../../common/constans.dart';
-import '../models/response/response_add_story_model.dart';
+import '../local_datasources/auth_localstorage.dart';
+import '../models/new_response/get_all_model.dart';
 
 class StoryDatasource {
-  Future<Either<String, ResponseGetAllStoriesModel>> getAll() async {
+  Future<Either<String, GetAllStoryModel>> getAll() async {
     final token = await AuthLocalDatasource().getToken();
 
     final response = await http.get(
       Uri.parse('${Constants.baseUrl}/stories'),
       headers: {'Authorization': 'Bearer $token'},
     );
+    print(response.body);
     if (response.statusCode == 200) {
       return Right(
-        ResponseGetAllStoriesModel.fromJson(
+        GetAllStoryModel.fromJson(
           json.decode(response.body),
         ),
       );
@@ -35,7 +34,7 @@ class StoryDatasource {
     }
   }
 
-  Future<Either<String, ResponseStoryDetailModel>> getDetailById(
+  Future<Either<String, DetailStoryResponseModel>> getDetailById(
       String id) async {
     final token = await AuthLocalDatasource().getToken();
 
@@ -47,7 +46,7 @@ class StoryDatasource {
 
     if (response.statusCode == 200) {
       return Right(
-        ResponseStoryDetailModel.fromJson(
+        DetailStoryResponseModel.fromJson(
           json.decode(response.body),
         ),
       );
@@ -56,8 +55,8 @@ class StoryDatasource {
     }
   }
 
-  Future<Either<String, ResponseAddStoryModel>> addNewStory(
-      RequestAddModel body) async {
+  Future<Either<String, AddNewStoryResponseModel>> addNewStory(
+      AddNewStoryRequestModel body) async {
     // try {
     final token = await AuthLocalDatasource().getToken();
 
@@ -104,7 +103,7 @@ class StoryDatasource {
       //   json.decode(responseData) as Map<String, dynamic>,
       // );
       return Right(
-        ResponseAddStoryModel.fromJson(
+        AddNewStoryResponseModel.fromJson(
           json.decode(responseData) as Map<String, dynamic>,
         ),
       );

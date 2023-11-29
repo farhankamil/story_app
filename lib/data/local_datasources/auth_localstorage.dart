@@ -1,9 +1,8 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:storyapp_intermediate/data/models/response/response_get_all_stories_model.dart';
 
-import '../models/response/response_login_model.dart';
+import '../models/new_response/login_response_model.dart';
 
 // class AuthLocalDatasource {
 //   Future<String> saveToken(String token) async {

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:storyapp_intermediate/bloc/get_all_story/get_all_story_bloc.dart';
-import 'package:storyapp_intermediate/presentation/add_story_page.dart';
-import 'package:storyapp_intermediate/presentation/my_restaurant_page.dart';
+import 'package:storyapp_intermediate/new_bloc/login/login_bloc.dart';
+import 'package:storyapp_intermediate/presentation/my_account_page.dart';
+import 'package:storyapp_intermediate/presentation/widgets/error_message.dart';
 import 'package:storyapp_intermediate/presentation/widgets/list.dart';
+
+import '../new_bloc/get_all/get_all_bloc.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = '/home';
@@ -17,74 +19,77 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   void initState() {
-    context.read<GetAllStoryBloc>().add(const GetAllStoryEvent.get());
-    // context.read<GetAllStoryBloc>().add(DoGetAllStoryGetEvent());
+    context.read<GetAllBloc>().add(GetAllListEvent());
     super.initState();
+  }
+
+  Future<void> _reloadData() async {
+    context.read<GetAllBloc>().add(GetAllListEvent());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home - Profile'),
-        actions: [
-          IconButton(
-            onPressed: () async {},
-            icon: const Icon(Icons.logout_outlined),
-          )
-        ],
+        title: const Text('Home Story'),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: BlocBuilder<GetAllStoryBloc, GetAllStoryState>(
-            builder: (context, state) {
-              return state.when(
-                initial: () => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: () => const Text('error'),
-                loaded: (data) {
-                  return ListView.builder(
-                    itemBuilder: (context, index) {
-                      return RestaurantCard(data: data.listStory[index]);
-                    },
-                    itemCount: data.listStory.length,
+        child: BlocBuilder<GetAllBloc, GetAllState>(
+          builder: (context, state) {
+            if (state is GetAllLoading) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            if (state is GetAllLoaded) {
+              return ListView.builder(
+                itemCount: state.getAllStory.listStory.length,
+                itemBuilder: (context, index) {
+                  return RestaurantCard(
+                    listStory: state.getAllStory.listStory[index],
                   );
                 },
               );
-            },
-          ),
+            }
+
+            if (state is GetAllError) {
+              return ErrorMessage(
+                image: 'assets/images/no-internet.png',
+                message: 'Cek Koneksi',
+                onPressed: _reloadData,
+              );
+            }
+            return const Text('no data');
+          },
         ),
       ),
-
-   floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return const AddStoryPage();
-          }));
-        },
-        child: const Icon(Icons.add),
-      ),
-
- bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: 0,
         onTap: (value) {
           if (value == 1) {
-            context.push(MyRestaurantPage.routeName);
+            context.pushReplacement(MyRestaurantPage.routeName);
           }
         },
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.restaurant), label: 'All Restaurant'),
+            icon: Icon(
+              Icons.home,
+              color: Colors.black,
+            ),
+            label: 'Home',
+            backgroundColor: Colors.black,
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.person), label: 'My Account'),
+            icon: Icon(
+              Icons.person,
+              color: Colors.black,
+            ),
+            label: 'My Account',
+            backgroundColor: Colors.black,
+          ),
         ],
       ),
-
-
     );
   }
 }

@@ -1,4 +1,5 @@
 class AssetsPath {
-  static const logoDicodingDark = 'assets/logo/dicoding_dark.png';
-  static const placeHodler = 'assets/image/placeholder.jpeg';
+  static const placeHolder = 'assets/image/placeholder.jpeg';
+  static const icEmail = 'assets/icon_email.png';
+  static const icPassword = 'assets/icon_password.png';
 }

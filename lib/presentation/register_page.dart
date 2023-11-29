@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:storyapp_intermediate/bloc/register/register_bloc.dart';
-import 'package:storyapp_intermediate/data/models/request/request_register_model.dart';
-import 'package:storyapp_intermediate/presentation/home_page.dart';
+import 'package:storyapp_intermediate/data/models/new_request/register_request_model.dart';
+import 'package:storyapp_intermediate/new_bloc/sign_up/sign_up_bloc.dart';
 import 'package:storyapp_intermediate/presentation/login_page.dart';
+
+import '../common/constans.dart';
 
 class RegisterPage extends StatefulWidget {
   static const routeName = '/register';
@@ -19,6 +20,7 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController? nameController;
   TextEditingController? emailController;
   TextEditingController? passwordController;
+  bool _passwordVisible = true;
 
   @override
   void initState() {
@@ -39,114 +41,324 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Register App'),
+      backgroundColor: backgroundColor1,
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              header(),
+              nameInput(),
+              emailInput(),
+              passwordInput(),
+              BlocConsumer<SignUpBloc, SignUpState>(
+                listener: (context, state) {
+                  if (state is SignUpMessage) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.errorMessage),
+                      ),
+                    );
+                  }
+                  if (state is SignUpLoaded) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('berhasil register'),
+                      ),
+                    );
+                    nameController!.clear();
+                    emailController!.clear();
+                    passwordController!.clear();
+                    context.go(LoginPage.routeName);
+                  }
+                },
+                builder: (context, state) {
+                  if (state is SignUpLoading) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(40),
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+                  return signUpButton();
+                },
+              ),
+              const Spacer(),
+              footer(),
+            ],
+          ),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              decoration: const InputDecoration(labelText: 'Name'),
-              controller: nameController,
-            ),
-            TextField(
-              decoration: const InputDecoration(labelText: 'Email'),
-              controller: emailController,
-            ),
-            TextField(
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'Password'),
-              controller: passwordController,
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            BlocConsumer<RegisterBloc, RegisterState>(
-              listener: (context, state) {
-                // if (state is RegisterLoaded) {
-                //   ScaffoldMessenger.of(context).showSnackBar(
-                //     SnackBar(
-                //       content: Text(
-                //         "Success register with email: ${state.model.message}",
-                //       ),
-                //     ),
-                //   );
-                //   nameController!.clear();
-                //   emailController!.clear();
-                //   passwordController!.clear();
-                // }
+    );
+  }
 
-                state.maybeWhen(
-                  orElse: () {},
-                  error: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          "Error Register ",
-                        ),
-                      ),
-                    );
-                  },
-                  loaded: (model) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          "berhasil Register ",
-                        ),
-                      ),
-                    );
-                    context.go(HomePage.routeName);
-                  },
-                );
-              },
-              builder: (context, state) {
-                return state.maybeWhen(
-                  orElse: () {
-                    return ElevatedButton(
-                      onPressed: () {
-                        final requestModel = RequestRegisterModel(
-                          name: nameController!.text,
-                          email: emailController!.text,
-                          password: passwordController!.text,
-                        );
+  Widget header() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Sign Up',
+          style: primaryTextStyle.copyWith(
+            fontSize: 24,
+            fontWeight: semiBold,
+          ),
+        ),
+        const SizedBox(
+          height: 2,
+        ),
+        Text(
+          'Register and Happy',
+          style: subtitleTextStyle,
+        ),
+      ],
+    );
+  }
 
-                        context
-                            .read<RegisterBloc>()
-                            .add(RegisterEvent.add(requestModel));
-                      },
-                      child: const Text('Register'),
-                    );
-                  },
-                  loading: () => const Center(
-                    child: CircularProgressIndicator(),
+  Widget nameInput() {
+    return Container(
+      margin: const EdgeInsets.only(top: 50),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Full Name',
+            style: primaryTextStyle.copyWith(
+              fontSize: 16,
+              fontWeight: medium,
+            ),
+          ),
+          const SizedBox(
+            height: 12,
+          ),
+          Container(
+            height: 50,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+            ),
+            decoration: BoxDecoration(
+              color: backgroundColor2,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: Row(
+                children: [
+                  Image.asset(
+                    'assets/icon_name.png',
+                    width: 17,
                   ),
-                );
-              },
-            ),
-
-            // ElevatedButton(
-            //   onPressed: () {},
-            //   child: const Text('Register'),
-            // ),
-
-            const SizedBox(
-              height: 16,
-            ),
-            InkWell(
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return const LoginPage();
-                }));
-              },
-              child: const Text(
-                'Belum Punya Akun? Register',
-                style: TextStyle(decoration: TextDecoration.underline),
+                  const SizedBox(
+                    width: 16,
+                  ),
+                  Expanded(
+                    child: TextFormField(
+                      style: primaryTextStyle,
+                      controller: nameController,
+                      decoration: InputDecoration.collapsed(
+                        hintText: 'Your Full Name',
+                        hintStyle: subtitleTextStyle,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget emailInput() {
+    return Container(
+      margin: const EdgeInsets.only(top: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Email Address',
+            style: primaryTextStyle.copyWith(
+              fontSize: 16,
+              fontWeight: medium,
+            ),
+          ),
+          const SizedBox(
+            height: 12,
+          ),
+          Container(
+            height: 50,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+            ),
+            decoration: BoxDecoration(
+              color: backgroundColor2,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: Row(
+                children: [
+                  Image.asset(
+                    'assets/icon_email.png',
+                    width: 17,
+                  ),
+                  const SizedBox(
+                    width: 16,
+                  ),
+                  Expanded(
+                    child: TextFormField(
+                      style: primaryTextStyle,
+                      controller: emailController,
+                      decoration: InputDecoration.collapsed(
+                        hintText: 'Your Email Address',
+                        hintStyle: subtitleTextStyle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget passwordInput() {
+    return Container(
+      margin: const EdgeInsets.only(top: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Password',
+            style: primaryTextStyle.copyWith(
+              fontSize: 16,
+              fontWeight: medium,
+            ),
+          ),
+          const SizedBox(
+            height: 12,
+          ),
+          Container(
+            height: 50,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+            ),
+            decoration: BoxDecoration(
+              color: backgroundColor2,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: Row(
+                children: [
+                  Image.asset(
+                    'assets/icon_password.png',
+                    width: 17,
+                  ),
+                  const SizedBox(
+                    width: 16,
+                  ),
+                  Expanded(
+                    child: TextFormField(
+                      style: primaryTextStyle,
+                      obscureText: _passwordVisible,
+                      controller: passwordController,
+                      decoration: InputDecoration(
+                        hintText: 'Your Password',
+                        hintStyle: subtitleTextStyle,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _passwordVisible
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: primaryColor,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _passwordVisible = !_passwordVisible;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget signUpButton() {
+    return Container(
+      height: 50,
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 30),
+      child: TextButton(
+        onPressed: () {
+          final requestModel = RegisterRequestModel(
+            name: nameController!.text,
+            email: emailController!.text,
+            password: passwordController!.text,
+          );
+
+          context
+              .read<SignUpBloc>()
+              .add(DoSignUpEvent(registerRequest: requestModel));
+        },
+        style: TextButton.styleFrom(
+          backgroundColor: primaryColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
+        child: Text(
+          'Sign Up',
+          style: primaryTextStyle.copyWith(
+            fontSize: 16,
+            fontWeight: medium,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget footer() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 30),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Already have an account? ',
+            style: subtitleTextStyle.copyWith(
+              fontSize: 12,
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const LoginPage();
+                  },
+                ),
+              );
+            },
+            child: Text(
+              'Sign In',
+              style: purpleTextStyle.copyWith(
+                fontSize: 12,
+                fontWeight: medium,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

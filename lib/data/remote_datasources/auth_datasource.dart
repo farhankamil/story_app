@@ -2,16 +2,15 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:dartz/dartz.dart';
+import 'package:storyapp_intermediate/data/models/new_request/login_request_model.dart';
+import 'package:storyapp_intermediate/data/models/new_request/register_request_model.dart';
+import 'package:storyapp_intermediate/data/models/new_response/login_response_model.dart';
+import 'package:storyapp_intermediate/data/models/new_response/register_response_mode.dart';
 import '../../common/constans.dart';
-import '../local_datasources/auth_localstorage.dart';
-import '../models/request/request_login_model.dart';
-import '../models/request/request_register_model.dart';
-import '../models/response/response_login_model.dart';
-import '../models/response/response_register_model.dart';
 
 class AuthDatasource {
-  Future<Either<String, ResponseRegisterModel>> register(
-    RequestRegisterModel registerData,
+  Future<Either<String, RegisterResponseModel>> register(
+    RegisterRequestModel registerData,
   ) async {
     final response = await http.post(
       Uri.parse("${Constants.baseUrl}/register"),
@@ -23,17 +22,17 @@ class AuthDatasource {
 
     if (response.statusCode == 200) {
       return Right(
-        ResponseRegisterModel.fromJson(jsonDecode(response.body)),
+        RegisterResponseModel.fromJson(jsonDecode(response.body)),
       );
     } else {
       return const Left(
-        'API ERROR',
+        'Register Gagal',
       );
     }
   }
 
-  Future<Either<String, ResponseLoginModel>> login(
-    RequestLoginModel loginData,
+  Future<Either<String, LoginResponseModel>> login(
+    LoginRequestModel loginData,
   ) async {
     final response = await http.post(
       Uri.parse("${Constants.baseUrl}/login"),
@@ -42,15 +41,14 @@ class AuthDatasource {
       },
       body: jsonEncode(loginData.toJson()),
     );
-    print('ini response dari login body : ${response.body}');
-    if (response.statusCode == 200) {
 
+    if (response.statusCode == 200) {
       return Right(
-        ResponseLoginModel.fromJson(jsonDecode(response.body)),
+        LoginResponseModel.fromJson(jsonDecode(response.body)),
       );
     } else {
       return const Left(
-        'API ERROR',
+        'Login Gagal',
       );
     }
   }
